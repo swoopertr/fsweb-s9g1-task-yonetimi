@@ -1,26 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./app.css";
+import "./task.css";
 import Task from "./Task";
 import TaskForm from "./TaskForm";
 import TaskHookForm from "./TaskHookForm";
 import PeopleForm from "./PeopleForm";
-import { initialTasks, initialTeam } from "./data";
-
+import PeopleHookForm from "./PeopleHookForm";
+import {DataUnit} from "./data"
 
 function App() {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [team, setTeam] = useState(initialTeam);
+  const tasks_ = DataUnit.listAllTasks()
+  const people_ = DataUnit.listPeople()
+  const [tasks, setTasks] = useState(tasks_);
+  const [team, setTeam] = useState(people_);
+
+
+  // useEffect(() => {
+  //   const tempTask = DataUnit.listAllTasks()
+  //   const tempPeople = DataUnit.listPeople()
+  //   setTasks(tempTask)
+  //   setTeam(tempPeople)
+  // }, []);
 
   function handleTaskSubmit(yeniTask) {
-    setTasks([yeniTask, ...tasks])
+    DataUnit.saveTask(yeniTask);
+    const allTasks = DataUnit.listAllTasks();
+    setTasks(allTasks);
   }
 
   function handlePeopleSubmit(yeniKisi) {
-    setTeam([...team, yeniKisi])
+    DataUnit.savePerson(yeniKisi);
+    const allTeamMembers = DataUnit.listPeople();
+    setTeam(allTeamMembers);
   }
 
   function handleComplete(id) {
-    console.log("tamamlama fonksiyonunu buraya yazın")
+   DataUnit.taskStateChange(id);
+   const allTasks = DataUnit.listAllTasks();
+   setTasks(allTasks);
   }
 
   return (
@@ -34,26 +51,29 @@ function App() {
 
         <div className="form-container">
           <h2>Yeni Kişi</h2>
-          <PeopleForm kisiler={team} submitFn={handlePeopleSubmit} />
+          <PeopleHookForm kisiler={team} submitFn={handlePeopleSubmit} />
         </div>
       </div>
       <div className="columns">
         <div className="column">
           <h2 className="column-title">Yapılacaklar</h2>
           <div className="column-list">
-            {tasks
-              .filter((t) => t.status === "yapılacak")
-              .map((t) => (
+            {
+              tasks 
+              && 
+              DataUnit.listUnfinishedTasks().map((t) => (
                 <Task key={t.id} taskObj={t} onComplete={handleComplete} />
-              ))}
+              ))
+            }
           </div>
         </div>
         <div className="column">
           <h2 className="column-title">Tamamlananlar</h2>
           <div className="column-list">
-            {tasks
-              .filter((t) => t.status === "yapıldı")
-              .map((t) => (
+            {
+              tasks 
+              && 
+              DataUnit.listFinishedTasks().map((t) => (
                 <Task key={t.id} taskObj={t} />
               ))}
           </div>

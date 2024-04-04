@@ -45,6 +45,10 @@
   box-shadow: 0 4px 5px 0 rgb(0 0 0 / 10%);
 }
 
+.task:hover {
+  box-shadow: 0 4px 5px 0 rgb(0 0 0 / 50%);
+}
+
 .task h3 {
   font-size: 18px;
   color: #c8781a;
